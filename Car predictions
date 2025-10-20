@@ -1,0 +1,79 @@
+# Import necessary libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load dataset
+# (Place the dataset in the same folder or give the full file path)
+df = pd.read_csv("car_data.csv")
+
+# Display first few rows
+print("First 5 rows of the dataset:")
+print(df.head())
+
+# Show dataset info
+print("\nDataset Information:")
+print(df.info())
+
+# Show summary statistics
+print("\nSummary Statistics:")
+print(df.describe())
+
+# Check for missing values
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+# Display unique values for categorical columns
+print("\nUnique values in categorical columns:")
+for col in df.select_dtypes(include='object').columns:
+    print(f"{col}: {df[col].unique()}")
+
+# Rename columns (optional, for easy access)
+df.columns = [col.strip().replace(" ", "_") for col in df.columns]
+
+# Correlation heatmap (numerical columns)
+plt.figure(figsize=(8,6))
+sns.heatmap(df.select_dtypes(include='number').corr(), annot=True, cmap='coolwarm')
+plt.title("Correlation Heatmap of Numerical Features")
+plt.show()
+
+# Distribution of car prices
+if 'Selling_Price' in df.columns:
+    plt.figure(figsize=(8,6))
+    sns.histplot(df['Selling_Price'], kde=True)
+    plt.title("Distribution of Selling Prices")
+    plt.xlabel("Selling Price (in Lakhs or USD)")
+    plt.show()
+
+# Relationship between car age and price
+if 'Year' in df.columns and 'Selling_Price' in df.columns:
+    plt.figure(figsize=(8,6))
+    sns.scatterplot(x=df['Year'], y=df['Selling_Price'])
+    plt.title("Car Age vs Selling Price")
+    plt.xlabel("Year of Manufacture")
+    plt.ylabel("Selling Price")
+    plt.show()
+
+# Fuel type vs selling price
+if 'Fuel_Type' in df.columns and 'Selling_Price' in df.columns:
+    plt.figure(figsize=(8,6))
+    sns.boxplot(x='Fuel_Type', y='Selling_Price', data=df, palette='Set2')
+    plt.title("Selling Price by Fuel Type")
+    plt.show()
+
+# Transmission vs selling price
+if 'Transmission' in df.columns and 'Selling_Price' in df.columns:
+    plt.figure(figsize=(8,6))
+    sns.boxplot(x='Transmission', y='Selling_Price', data=df, palette='Set1')
+    plt.title("Selling Price by Transmission Type")
+    plt.show()
+
+# Company-wise average price
+if 'Car_Name' in df.columns and 'Selling_Price' in df.columns:
+    company_avg = df.groupby('Car_Name')['Selling_Price'].mean().sort_values(ascending=False).head(10)
+    plt.figure(figsize=(10,6))
+    sns.barplot(x=company_avg.values, y=company_avg.index, palette="magma")
+    plt.title("Top 10 Car Brands by Average Selling Price")
+    plt.xlabel("Average Selling Price")
+    plt.ylabel("Car Brand")
+    plt.show()
