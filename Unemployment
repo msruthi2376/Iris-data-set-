@@ -1,0 +1,59 @@
+# Importing libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+# (Make sure your CSV file is in the same folder, or give the full path)
+df = pd.read_csv("Unemployment_in_India.csv")
+
+# Display first few rows
+print("First 5 rows of the dataset:")
+print(df.head())
+
+# Show basic info
+print("\nDataset Information:")
+print(df.info())
+
+# Show summary statistics
+print("\nSummary Statistics:")
+print(df.describe())
+
+# Check for missing values
+print("\nMissing Values in Each Column:")
+print(df.isnull().sum())
+
+# Rename columns if necessary (adjust according to your dataset)
+# Example: If your CSV has columns like 'Region.1' or 'Estimated Unemployment Rate (%)'
+df.columns = [col.strip().replace(" ", "_").replace(".", "_") for col in df.columns]
+
+# Display number of records per region
+if 'Region' in df.columns:
+    print("\nNumber of records per region:")
+    print(df['Region'].value_counts())
+
+# Plot unemployment rate over time (if Date column exists)
+if 'Date' in df.columns and 'Estimated_Unemployment_Rate_(%)' in df.columns:
+    plt.figure(figsize=(12,6))
+    sns.lineplot(x='Date', y='Estimated_Unemployment_Rate_(%)', data=df)
+    plt.title("Unemployment Rate in India Over Time")
+    plt.xlabel("Date")
+    plt.ylabel("Unemployment Rate (%)")
+    plt.xticks(rotation=45)
+    plt.show()
+
+# Region-wise average unemployment rate
+if 'Region' in df.columns and 'Estimated_Unemployment_Rate_(%)' in df.columns:
+    region_avg = df.groupby('Region')['Estimated_Unemployment_Rate_(%)'].mean().sort_values()
+    plt.figure(figsize=(10,6))
+    sns.barplot(x=region_avg.values, y=region_avg.index, palette="viridis")
+    plt.title("Average Unemployment Rate by Region")
+    plt.xlabel("Unemployment Rate (%)")
+    plt.ylabel("Region")
+    plt.show()
+
+# Correlation heatmap (if numerical columns exist)
+plt.figure(figsize=(8,6))
+sns.heatmap(df.select_dtypes(include='number').corr(), annot=True, cmap='coolwarm')
+plt.title("Correlation Heatmap of Numerical Features")
+plt.show()
